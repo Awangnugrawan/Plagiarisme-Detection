@@ -270,44 +270,86 @@ def visualize_results(plagiarized_files, title):
 uploaded_files_history = []
 
 
-def main():
-    st.header("🏠 Welcome to Plagiarism Detection for Python Code!")
 
-    st.markdown("This web application helps you detect plagiarism in Python code.")
+def main():
+    # Menambahkan opsi pemilihan bahasa di sidebar
+    language = st.sidebar.selectbox("Language / Bahasa", ["English", "Indonesia"])
+
+    if language == "English":
+        st.header("🏠 Welcome to Plagiarism Detection for Python Code!")
+        st.markdown("This web application helps you detect plagiarism in Python code.")
+    else:
+        st.header("🏠 Selamat Datang di Deteksi Plagiarisme untuk Kode Python!")
+        st.markdown(
+            "Aplikasi web ini membantu Anda mendeteksi plagiarisme dalam kode Python."
+        )
 
     with st.expander(
-        "                                                              🔔 Plagiarism Detection Steps ⬇️                                "
+        "🔔 Plagiarism Detection Steps ⬇️"
+        if language == "English"
+        else "🔔 Langkah-langkah Deteksi Plagiarisme ⬇️"
     ):
-        st.subheader("📂 Upload Your Python Files")
-        st.markdown(
-            "Upload two or more Python files that you want to compare for plagiarism. Click the **Browse files** button on the side ⬅️ and select the Python files from your computer."
-        )
+        if language == "English":
+            st.subheader("📂 Upload Your Python Files")
+            st.markdown(
+                "Upload two or more Python files that you want to compare for plagiarism. Click the **Browse files** button on the side ⬅️ and select the Python files from your computer."
+            )
 
-        st.subheader("🔢 Set Similarity Threshold")
-        st.markdown(
-            "Choose a similarity threshold percentage using the slider. Files with similarity percentages equal to or greater than this threshold will be considered plagiarized."
-        )
+            st.subheader("🔢 Set Similarity Threshold")
+            st.markdown(
+                "Choose a similarity threshold percentage using the slider. Files with similarity percentages equal to or greater than this threshold will be considered plagiarized."
+            )
 
-        st.subheader("🚀 Detect Plagiarism")
-        st.markdown(
-            "Once you have uploaded your files and set the similarity threshold, click the **Detect Plagiarism** button to start the detection process."
-        )
+            st.subheader("🚀 Detect Plagiarism")
+            st.markdown(
+                "Once you have uploaded your files and set the similarity threshold, click the **Detect Plagiarism** button to start the detection process."
+            )
 
-        st.subheader("📝 Plagiarism Detection Results")
-        st.markdown(
-            "After the detection process is complete, the results will be displayed in different tabs. Each tab represents a different method of plagiarism detection."
-        )
+            st.subheader("📝 Plagiarism Detection Results")
+            st.markdown(
+                "After the detection process is complete, the results will be displayed in different tabs. Each tab represents a different method of plagiarism detection."
+            )
+        else:
+            st.subheader("📂 Unggah File Python")
+            st.markdown(
+                "Unggah dua atau lebih file Python yang ingin  dibandingkan untuk plagiarisme. Klik tombol **Telusuri file** di samping ⬅️ dan pilih file Python dari local komputer ."
+            )
 
-    st.sidebar.title("🔍 Plagiarism Detection Settings")
+            st.subheader("🔢 Atur Ambang Batas Kemiripan")
+            st.markdown(
+                "Pilih persentase ambang batas kemiripan menggunakan slider. File dengan persentase kemiripan sama dengan atau lebih besar dari ambang batas ini akan dianggap plagiarisme."
+            )
+
+            st.subheader("🚀 Deteksi Plagiarisme")
+            st.markdown(
+                "Setelah mengunggah file dan mengatur ambang batas kemiripan, klik tombol **Deteksi Plagiarisme** untuk memulai proses deteksi."
+            )
+
+            st.subheader("📝 Hasil Deteksi Plagiarisme")
+            st.markdown(
+                "Setelah proses deteksi selesai, hasilnya akan ditampilkan di berbagai tab. Setiap tab mewakili metode deteksi plagiarisme yang berbeda."
+            )
+
+    st.sidebar.title(
+        "🔍 Plagiarism Detection Settings"
+        if language == "English"
+        else "🔍 Pengaturan Deteksi Plagiarisme"
+    )
 
     # Menyimpan riwayat file yang diupload
     if uploaded_files_history:
-        st.sidebar.write("Uploaded Files History:")
+        st.sidebar.write(
+            "Uploaded Files History:"
+            if language == "English"
+            else "Riwayat File yang Diupload:"
+        )
         for file_name in uploaded_files_history:
             st.sidebar.write(file_name)
 
     uploaded_files = st.sidebar.file_uploader(
-        "📂 Upload Python Files", type="py", accept_multiple_files=True
+        "📂 Upload Python Files" if language == "English" else "📂 Unggah File Python",
+        type="py",
+        accept_multiple_files=True,
     )
 
     # Menambahkan file yang baru diupload ke dalam riwayat
@@ -317,15 +359,33 @@ def main():
                 uploaded_files_history.append(uploaded_file.name)
 
     threshold = (
-        st.sidebar.selectbox("🔢 Similarity Threshold (%)", range(0, 101, 5)) / 100
+        st.sidebar.selectbox(
+            (
+                "🔢 Similarity Threshold (%)"
+                if language == "English"
+                else "🔢 Ambang Batas Kemiripan (%)"
+            ),
+            range(0, 101, 5),
+        )
+        / 100
     )
 
     # Fungsi deteksi plagiarisme
-    if st.sidebar.button("🚀 Detect Plagiarism"):
+    if st.sidebar.button(
+        "🚀 Detect Plagiarism" if language == "English" else "🚀 Deteksi Plagiarisme"
+    ):
         if not uploaded_files:
-            st.sidebar.error("❗ Please upload at least two files.")
+            st.sidebar.error(
+                "❗ Please upload at least two files."
+                if language == "English"
+                else "❗ Silakan unggah setidaknya dua file."
+            )
         elif len(uploaded_files) < 2:
-            st.sidebar.error("❗ Please upload at least two files.")
+            st.sidebar.error(
+                "❗ Please upload at least two files."
+                if language == "English"
+                else "❗ Silakan unggah setidaknya dua file."
+            )
         else:
             with tempfile.TemporaryDirectory() as temp_dir:
                 file_paths = []
@@ -362,54 +422,121 @@ def main():
 
                     progress = int(step / total_steps * 100)
                     progress_bar.progress(progress)
-                    progress_text.write(f"Loading... {progress}%")
+                    progress_text.write(
+                        f"Loading... {progress}%"
+                        if language == "English"
+                        else f"Memuat... {progress}%"
+                    )
                     time.sleep(1)  # Simulate some processing time
 
-                st.success("✅ Plagiarism detection completed.")
+                st.success(
+                    "✅ Plagiarism detection completed."
+                    if language == "English"
+                    else "✅ Deteksi plagiarisme selesai."
+                )
                 progress_placeholder.empty()  # Remove the progress bar
                 progress_text.empty()  # Remove the progress text
 
-                st.header("📝 Plagiarism Detection Results")
-                st.subheader(f"**Number of Python files compared: {len(file_paths)}**")
+                st.header(
+                    "📝 Plagiarism Detection Results"
+                    if language == "English"
+                    else "📝 Hasil Deteksi Plagiarisme"
+                )
+                st.subheader(
+                    f"**Number of Python files compared: {len(file_paths)}**"
+                    if language == "English"
+                    else f"**Jumlah file Python yang dibandingkan: {len(file_paths)}**"
+                )
 
                 def format_duration(duration):
                     if duration > 60:
                         minutes = int(duration // 60)
                         seconds = duration % 60
-                        return f"{minutes} minutes {seconds:.2f} seconds"
+                        return (
+                            f"{minutes} minutes {seconds:.2f} seconds"
+                            if language == "English"
+                            else f"{minutes} menit {seconds:.2f} detik"
+                        )
                     else:
-                        return f"{duration:.2f} seconds"
+                        return (
+                            f"{duration:.2f} seconds"
+                            if language == "English"
+                            else f"{duration:.2f} detik"
+                        )
 
                 st.write(
                     f"**Rabin-Karp Duration:** {format_duration(durations[0])}, detected {len(results_rabinkarp)} plagiarized file."
+                    if language == "English"
+                    else f"**Durasi Rabin-Karp:** {format_duration(durations[0])}, terdeteksi {len(results_rabinkarp)} file yang plagiat."
                 )
                 st.write(
                     f"**Levenshtein Distance Duration:** {format_duration(durations[1])}, detected {len(results_levenshtein)} plagiarized file."
+                    if language == "English"
+                    else f"**Durasi Jarak Levenshtein:** {format_duration(durations[1])}, terdeteksi {len(results_levenshtein)} file yang plagiat."
                 )
                 st.write(
                     f"**Voting Classifier Duration:** {format_duration(durations[2])}, detected {len(results_voting)} plagiarized file."
+                    if language == "English"
+                    else f"**Durasi Voting Classifier:** {format_duration(durations[2])}, terdeteksi {len(results_voting)} file yang plagiat."
                 )
                 tab1, tab2, tab3 = st.tabs(
-                    ["🔍 Levenshtein Distance", "🔍 Rabin-Karp", "🔍 Voting Classifier"]
+                    [
+                        (
+                            "🔍 Levenshtein Distance"
+                            if language == "English"
+                            else "🔍 Jarak Levenshtein"
+                        ),
+                        "🔍 Rabin-Karp",
+                        "🔍 Voting Classifier",
+                    ]
                 )
 
                 with tab1:
-                    st.subheader("Levenshtein Distance Results")
+                    st.subheader(
+                        "Levenshtein Distance Results"
+                        if language == "English"
+                        else "Hasil Levenshtein Distance"
+                    )
                     visualize_results(
                         results_levenshtein,
-                        "Levenshtein Distance Plagiarism Detection Results",
+                        (
+                            "Levenshtein Distance Plagiarism Detection Results"
+                            if language == "English"
+                            else "Hasil Deteksi Plagiarisme Jarak Levenshtein"
+                        ),
+                        language,
                     )
 
                 with tab2:
-                    st.subheader("Rabin-Karp Results")
+                    st.subheader(
+                        "Rabin-Karp Results"
+                        if language == "English"
+                        else "Hasil Rabin-Karp"
+                    )
                     visualize_results(
-                        results_rabinkarp, "Rabin-Karp Plagiarism Detection Results"
+                        results_rabinkarp,
+                        (
+                            "Rabin-Karp Plagiarism Detection Results"
+                            if language == "English"
+                            else "Hasil Deteksi Plagiarisme Rabin-Karp"
+                        ),
+                        language,
                     )
 
                 with tab3:
-                    st.subheader("Voting Classifier Results")
+                    st.subheader(
+                        "Voting Classifier Results"
+                        if language == "English"
+                        else "Hasil Voting Classifier"
+                    )
                     visualize_results(
-                        results_voting, "Voting Classifier Plagiarism Detection Results"
+                        results_voting,
+                        (
+                            "Voting Classifier Plagiarism Detection Results"
+                            if language == "English"
+                            else "Hasil Deteksi Plagiarisme Voting Classifier"
+                        ),
+                        language,
                     )
 
     st.sidebar.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
@@ -420,5 +547,7 @@ def main():
 
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Plagiarism Detection", layout="wide")
+    st.set_page_config(
+        page_title="Plagiarism Detection", page_icon="https://cdn-icons-png.flaticon.com/128/2621/2621303.png", layout="wide"
+    )
     main()
