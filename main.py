@@ -226,9 +226,12 @@ def find_plagiarized_files_voting(file_paths, threshold):
 
 
 # Fungsi untuk visualisasi hasil plagiarisme
-def visualize_results(plagiarized_files, title):
+def visualize_results(plagiarized_files, title, language):
     if not plagiarized_files:
-        st.write("❌ No plagiarism detected.")
+        if language == "English":
+            st.write("❌ No plagiarism detected.")
+        else:
+            st.write("❌ Tidak ada plagiarisme yang terdeteksi.")
         return
 
     df_data = []
@@ -247,24 +250,44 @@ def visualize_results(plagiarized_files, title):
 
     for i, row in df.iterrows():
         similarity_formatted = f"**{row['Similarity (%)']}%**"
-        with st.expander(
-            f"📄 {row['File 1']} vs 📄 {row['File 2']} - Similarity: {similarity_formatted}"
-        ):
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(
-                    f"<p style='font-size:24px; text-align:center;'>📄 {row['File 1']}</p>",
-                    unsafe_allow_html=True,
-                )
-                with open(row["Path 1"], "r", encoding="utf-8") as f:
-                    st.code(f.read(), language="python")
-            with col2:
-                st.markdown(
-                    f"<p style='font-size:24px; text-align:center;'>📄 {row['File 2']}</p>",
-                    unsafe_allow_html=True,
-                )
-                with open(row["Path 2"], "r", encoding="utf-8") as f:
-                    st.code(f.read(), language="python")
+        if language == "English":
+            with st.expander(
+                f"📄 {row['File 1']} vs 📄 {row['File 2']} - Similarity: {similarity_formatted}"
+            ):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(
+                        f"<p style='font-size:24px; text-align:center;'>📄 {row['File 1']}</p>",
+                        unsafe_allow_html=True,
+                    )
+                    with open(row["Path 1"], "r", encoding="utf-8") as f:
+                        st.code(f.read(), language="python")
+                with col2:
+                    st.markdown(
+                        f"<p style='font-size:24px; text-align:center;'>📄 {row['File 2']}</p>",
+                        unsafe_allow_html=True,
+                    )
+                    with open(row["Path 2"], "r", encoding="utf-8") as f:
+                        st.code(f.read(), language="python")
+        else:
+            with st.expander(
+                f"📄 {row['File 1']} vs 📄 {row['File 2']} - Kemiripan: {similarity_formatted}"
+            ):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(
+                        f"<p style='font-size:24px; text-align:center;'>📄 {row['File 1']}</p>",
+                        unsafe_allow_html=True,
+                    )
+                    with open(row["Path 1"], "r", encoding="utf-8") as f:
+                        st.code(f.read(), language="python")
+                with col2:
+                    st.markdown(
+                        f"<p style='font-size:24px; text-align:center;'>📄 {row['File 2']}</p>",
+                        unsafe_allow_html=True,
+                    )
+                    with open(row["Path 2"], "r", encoding="utf-8") as f:
+                        st.code(f.read(), language="python")
 
 
 uploaded_files_history = []
