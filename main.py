@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.ensemble import VotingClassifier
 import time
 
-
+@st.cache_data
 def preprocess_text(text):
     # Menghilangkan komentar
     text = re.sub(r"#.*", "", text)
@@ -58,7 +58,7 @@ def levenshtein_distance(s1, s2):
         previous_row = current_row
     return previous_row[-1]
 
-
+@st.cache_data
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Levenshtein distance
 def find_plagiarized_files_levenshtein(file_paths, threshold):
     plagiarized_files = []
@@ -107,7 +107,8 @@ class RabinKarp:
             old_hash - ord(old_char) * (self.base ** (k - 1))
         ) + ord(new_char)
         return new_hash
-
+        
+    @st.cache_data
     def get_hash_values(self):
         hash_values = []
         # Pembentukan N-gram dan hitung hash awal untuk N-gram pertama
@@ -124,7 +125,7 @@ class RabinKarp:
             hash_values.append(self.hash_value)
         return hash_values
 
-
+@st.cache_data
 def calculate_similarity(text1, text2, k=5):
     rk1 = RabinKarp(text1, k)
     rk2 = RabinKarp(text2, k)
@@ -137,7 +138,7 @@ def calculate_similarity(text1, text2, k=5):
     similarity = common_hashes / len(set(hash_values1).union(set(hash_values2)))
     return similarity
 
-
+@st.cache_data
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Rabin-Karp
 def find_plagiarized_files_rabinkarp(file_paths, threshold):
     plagiarized_files = []
@@ -190,7 +191,7 @@ class RabinKarpEstimator(BaseEstimator, ClassifierMixin):
         similarity = calculate_similarity(s1, s2)
         return similarity
 
-
+@st.cache_data
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Voting Classifier
 def find_plagiarized_files_voting(file_paths, threshold):
     plagiarized_files = []
