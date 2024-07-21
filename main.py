@@ -301,7 +301,6 @@ uploaded_files_history = []
 
 
 def main():
-    # Menambahkan opsi pemilihan bahasa di sidebar
     language = st.sidebar.selectbox("Language / Bahasa", ["English", "Indonesia"])
 
     if language == "English":
@@ -571,7 +570,7 @@ def main():
     st.sidebar.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
     st.sidebar.markdown(
-        "[© Awang Mulya Nugrawan](https://www.linkedin.com/in/awang-nugrawan/)"
+        "[© 2024 Awang Mulya Nugrawan](https://www.linkedin.com/in/awang-nugrawan/)"
     )
 
 
