@@ -58,7 +58,6 @@ def levenshtein_distance(s1, s2):
     return previous_row[-1]
 
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Levenshtein distance
-@st.cache_data
 def find_plagiarized_files_levenshtein(file_paths, threshold):
     plagiarized_files = []
     for i, file_path1 in enumerate(file_paths):
@@ -229,7 +228,6 @@ def find_plagiarized_files_voting(file_paths, threshold):
 
 
 # Fungsi untuk visualisasi hasil plagiarisme
-@st.cache_data
 def visualize_results(plagiarized_files, title, language):
     if not plagiarized_files:
         if language == "English":
