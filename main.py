@@ -41,6 +41,7 @@ def preprocess_text(text):
 
 
 # Fungsi untuk menghitung Levenshtein distance
+@st.cache_data
 def levenshtein_distance(s1, s2):
     if len(s1) < len(s2):
         return levenshtein_distance(s2, s1)
