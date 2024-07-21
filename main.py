@@ -86,43 +86,56 @@ def find_plagiarized_files_levenshtein(file_paths, threshold):
     return plagiarized_files
 
 
-# Fungsi untuk tokenisasi kode
-def tokenize_code(text):
-    tokens = []
-    with io.StringIO(text) as f:
-        for tok in tokenize.generate_tokens(f.readline):
-            tokens.append(tok.string)
-    return tokens
+class RabinKarp:
+    def __init__(self, text, pattern_length, base=256):
+        self.text = text
+        self.pattern_length = pattern_length
+        self.base = base
+        self.text_length = len(text)
+        self.hash_value = 0
+
+    def calculate_hash(self, start, end):
+        k = end - start  # Panjang k-gram
+        hash_value = 0
+        for i in range(start, end):
+            hash_value += ord(self.text[i]) * (self.base ** (k - 1 - (i - start)))
+        return hash_value
+
+    def recalculate_hash(self, old_hash, old_char, new_char):
+        k = self.pattern_length
+        new_hash = self.base * (
+            old_hash - ord(old_char) * (self.base ** (k - 1))
+        ) + ord(new_char)
+        return new_hash
+
+    def get_hash_values(self):
+        hash_values = []
+        # Pembentukan N-gram dan hitung hash awal untuk N-gram pertama
+        self.hash_value = self.calculate_hash(0, self.pattern_length)
+        hash_values.append(self.hash_value)
+
+        for i in range(1, self.text_length - self.pattern_length + 1):
+            # Hitung hash ulang untuk N-gram berikutnya
+            self.hash_value = self.recalculate_hash(
+                self.hash_value,
+                self.text[i - 1],
+                self.text[i + self.pattern_length - 1],
+            )
+            hash_values.append(self.hash_value)
+        return hash_values
 
 
-# Fungsi untuk membuat shingles
-def create_shingles(tokens, k=5):
-    return [tuple(tokens[i : i + k]) for i in range(len(tokens) - k + 1)]
+def calculate_similarity(text1, text2, k=5):
+    rk1 = RabinKarp(text1, k)
+    rk2 = RabinKarp(text2, k)
 
+    hash_values1 = rk1.get_hash_values()
+    hash_values2 = rk2.get_hash_values()
 
-# Fungsi untuk menghitung hash Rabin-Karp
-def rabin_karp_hash(shingle, q=101):
-    d = 256
-    hash_value = 0
-    for token in shingle:
-        for char in token:
-            hash_value = (d * hash_value + ord(char)) % q
-    return hash_value
+    common_hashes = len(set(hash_values1).intersection(set(hash_values2)))
 
-
-# Fungsi untuk mencocokkan shingles menggunakan Rabin-Karp
-def rabin_karp_matcher(shingles1, shingles2):
-    q = 101
-    hash_set1 = {rabin_karp_hash(shingle, q) for shingle in shingles1}
-    hash_set2 = {rabin_karp_hash(shingle, q) for shingle in shingles2}
-    intersection = hash_set1.intersection(hash_set2)
-    return len(intersection), len(hash_set1.union(hash_set2))
-
-
-# Fungsi untuk menghitung similarity Jaccard
-def calculate_jaccard_similarity(shingles1, shingles2):
-    intersection_size, union_size = rabin_karp_matcher(shingles1, shingles2)
-    return intersection_size / union_size
+    similarity = common_hashes / len(set(hash_values1).union(set(hash_values2)))
+    return similarity
 
 
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Rabin-Karp
@@ -135,11 +148,8 @@ def find_plagiarized_files_rabinkarp(file_paths, threshold):
             ) as f2:
                 content1 = preprocess_text(f1.read())
                 content2 = preprocess_text(f2.read())
-                tokens1 = tokenize_code(content1)
-                tokens2 = tokenize_code(content2)
-                shingles1 = create_shingles(tokens1)
-                shingles2 = create_shingles(tokens2)
-                similarity = calculate_jaccard_similarity(shingles1, shingles2)
+
+                similarity = calculate_similarity(content1, content2)
                 if similarity >= threshold:
                     plagiarized_files.append(
                         (
@@ -177,11 +187,8 @@ class RabinKarpEstimator(BaseEstimator, ClassifierMixin):
         return np.array([[1 - sim, sim] for sim in similarities])
 
     def _rabin_karp_similarity(self, s1, s2):
-        tokens1 = tokenize_code(s1)
-        tokens2 = tokenize_code(s2)
-        shingles1 = create_shingles(tokens1)
-        shingles2 = create_shingles(tokens2)
-        return calculate_jaccard_similarity(shingles1, shingles2)
+        similarity = calculate_similarity(s1, s2)
+        return similarity
 
 
 # Fungsi untuk mencari file yang terdeteksi plagiarisme menggunakan Voting Classifier
@@ -291,7 +298,6 @@ def visualize_results(plagiarized_files, title, language):
 
 
 uploaded_files_history = []
-
 
 
 def main():
@@ -571,6 +577,8 @@ def main():
 
 if __name__ == "__main__":
     st.set_page_config(
-        page_title="Plagiarism Detection", page_icon="https://cdn-icons-png.flaticon.com/128/2621/2621303.png", layout="wide"
+        page_title="Plagiarism Detection",
+        page_icon="https://cdn-icons-png.flaticon.com/128/2621/2621303.png",
+        layout="wide",
     )
     main()
