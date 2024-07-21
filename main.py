@@ -163,7 +163,7 @@ def find_plagiarized_files_rabinkarp(file_paths, threshold):
 class LevenshteinEstimator(BaseEstimator, ClassifierMixin):
     def fit(self, X, y=None):
         return self
-
+    
     def predict_proba(self, X):
         similarities = [self._levenshtein_similarity(x[0], x[1]) for x in X]
         return np.array([[1 - sim, sim] for sim in similarities])
