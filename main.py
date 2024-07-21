@@ -228,6 +228,7 @@ def find_plagiarized_files_voting(file_paths, threshold):
 
 
 # Fungsi untuk visualisasi hasil plagiarisme
+@st.cache_data
 def visualize_results(plagiarized_files, title, language):
     if not plagiarized_files:
         if language == "English":
