@@ -10,7 +10,6 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.ensemble import VotingClassifier
 import time
 
-@st.cache_data
 def preprocess_text(text):
     # Menghilangkan komentar
     text = re.sub(r"#.*", "", text)
